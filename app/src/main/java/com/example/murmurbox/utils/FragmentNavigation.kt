@@ -13,11 +13,25 @@ object FragmentNavigation {
         isRoot: Boolean = false
     ) {
         val fm = activity.supportFragmentManager
+        val tag = fragment::class.java.simpleName
         val transaction = fm.beginTransaction()
-            .replace(containerId, fragment, fragment::class.java.simpleName)
+        val currentFragment = fm.findFragmentById(containerId)
+
+        if (currentFragment != null) {
+            transaction.hide(currentFragment)
+        }
+
+        var newFragment = fm.findFragmentByTag(tag)
+
+        if (newFragment == null) {
+            newFragment = fragment
+            transaction.add(containerId, newFragment, tag)
+        } else {
+            transaction.show(newFragment)
+        }
 
         if (!isRoot) {
-            transaction.addToBackStack(fragment::class.java.simpleName)
+            transaction.addToBackStack(tag)
         }
 
         transaction.commit()

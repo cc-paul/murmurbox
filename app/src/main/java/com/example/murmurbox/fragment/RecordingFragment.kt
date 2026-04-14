@@ -148,6 +148,11 @@ class RecordingFragment : Fragment() {
             }
         }
 
+        tvBack.setSafeClickListener {
+            //Need to check 1st if currently recording then ask question if want to stop
+            FragmentNavigation.goBack(requireActivity() as AppCompatActivity)
+        }
+
         return recordingView
     }
 
@@ -217,9 +222,9 @@ class RecordingFragment : Fragment() {
 
     private fun changeRecordStatusTitle() {
         if (isTalking) {
-            tvRecordReminder.text = "recording"
+            tvRecordStatus.text = "recording"
         } else {
-            tvRecordReminder.text = "record not started"
+            tvRecordStatus.text = "record not started"
         }
     }
 
