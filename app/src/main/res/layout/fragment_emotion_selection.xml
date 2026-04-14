@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/primary"
+    tools:context=".fragment.EmotionSelectionFragment">
+
+    <LinearLayout
+        android:layout_margin="30dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/tvBack"
+            android:textSize="16sp"
+            android:textColor="@color/text_color_gray"
+            android:textStyle="bold"
+            android:fontFamily="@font/man_semi"
+            android:text="&lt; back"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+
+        <TextView
+            android:layout_marginTop="30dp"
+            android:textSize="15sp"
+            android:textColor="@color/text_color_gray"
+            android:fontFamily="@font/man_semi"
+            android:text="HOW ARE YOU FEELING?"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:textStyle="bold"
+            android:fontFamily="@font/man_bold"
+            android:textSize="30sp"
+            android:text="Pick what feels"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:textStyle="bold"
+            android:fontFamily="@font/man_bold"
+            android:textSize="30sp"
+            android:text="closest to you?"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+
+        <LinearLayout
+            android:layout_marginTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/layout_bg"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvEmotions"
+            tools:listitem="@layout/item_emotion"
+            android:layout_weight="1"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <LinearLayout
+            android:id="@+id/lnSelectedEmotion"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_marginBottom="20dp"
+                android:background="@color/text_color_gray"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"/>
+
+            <androidx.cardview.widget.CardView
+                app:cardElevation="0dp"
+                app:cardCornerRadius="15dp"
+                android:layout_marginBottom="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_margin="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/imgEmotionStatus"
+                        android:layout_marginEnd="5dp"
+                        android:src="@drawable/circle_gray"
+                        android:layout_width="10dp"
+                        android:layout_height="match_parent"/>
+
+                    <TextView
+                        android:id="@+id/tvSelectedEmotion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/man_bold"
+                        android:text="no emotion selected"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_gray"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+
+        <androidx.cardview.widget.CardView
+            app:cardCornerRadius="10dp"
+            app:cardElevation="0dp"
+            android:backgroundTint="@color/button_border"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/crdContinue"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp"
+                android:layout_margin="1dp"
+                android:backgroundTint="@color/primary"
+                android:layout_width="match_parent"
+                android:layout_height="35dp">
+
+                <TextView
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/man_bold"
+                    android:textSize="15sp"
+                    android:text="continue"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+            </androidx.cardview.widget.CardView>
+
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+
+</FrameLayout>
