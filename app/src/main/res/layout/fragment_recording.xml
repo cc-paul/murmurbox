@@ -189,6 +189,7 @@
             android:layout_height="wrap_content"/>
 
         <TextView
+            android:id="@+id/tvRecordStatus"
             android:gravity="center"
             android:textSize="15sp"
             android:textColor="@color/text_color_gray"
@@ -209,6 +210,7 @@
             android:layout_height="wrap_content">
 
             <LinearLayout
+                android:id="@+id/lnPlayPause"
                 android:alpha="0.4"
                 android:gravity="center"
                 android:layout_weight="1"
@@ -216,7 +218,6 @@
                 android:layout_height="match_parent">
 
                 <LinearLayout
-                    android:id="@+id/lnPlayPause"
                     android:gravity="center"
                     android:background="@drawable/circle_white_bg"
                     android:layout_width="50dp"
@@ -240,14 +241,15 @@
                 android:layout_height="wrap_content">
 
                 <LinearLayout
-                    android:id="@+id/lnStartStopRecord"
+                    android:id="@+id/lnStartStopSaveRecord"
                     android:gravity="center"
                     android:background="@drawable/circle_record"
                     android:layout_width="100dp"
                     android:layout_height="100dp">
 
                     <ImageView
-                        android:background="@drawable/circle_white_bg"
+                        android:id="@+id/imgStartStopSaveRecord"
+                        android:src="@drawable/circle_white_bg"
                         android:layout_width="20dp"
                         android:layout_height="20dp"/>
 
@@ -256,6 +258,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/lnDelete"
                 android:alpha="0.4"
                 android:gravity="center"
                 android:layout_weight="1"
@@ -263,7 +266,6 @@
                 android:layout_height="match_parent">
 
                 <LinearLayout
-                    android:id="@+id/lnDelete"
                     android:gravity="center"
                     android:background="@drawable/circle_white_bg"
                     android:layout_width="50dp"
@@ -282,7 +284,7 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/tvReminder"
+            android:id="@+id/tvRecordReminder"
             android:gravity="center"
             android:textSize="15sp"
             android:textColor="@color/text_color_gray"
