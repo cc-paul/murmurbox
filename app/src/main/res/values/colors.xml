@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
+    <color name="black">#1e293b</color>
     <color name="white">#FFFFFFFF</color>
     <color name="primary">#f7f6f3</color>
     <color name="text_color_gray">#c7c1b6</color>
@@ -8,5 +8,10 @@
     <color name="button_bg">#2e2c28</color>
     <color name="streak">#bb771a</color>
     <color name="text_gray">#868480</color>
-    <color name="ligh_black">#636363</color>
+    <color name="light_black">#636363</color>
+    <color name="light_blue">#f1f5f9</color>
+    <color name="text_gray_2">#c1cad6</color>
+    <color name="medium_blue">#9296f3</color>
+    <color name="dark_blue">#1e293b</color>
+    <color name="semi_blue">#e8ecf3</color>
 </resources>

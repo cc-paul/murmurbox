@@ -42,7 +42,7 @@ class EmotionAdapter(
         )
 
         holder.crdEmotion.setCardBackgroundColor(
-            if (isSelected) R.color.ligh_black else Color.WHITE
+            if (isSelected) R.color.light_black else Color.WHITE
         )
 
         holder.crdEmotion.setOnClickListener {
