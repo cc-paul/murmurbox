@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -16,6 +17,7 @@ import androidx.core.graphics.toColorInt
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.murmurbox.MainActivity
 import com.example.murmurbox.R
 import com.example.murmurbox.data.local.database.AppDatabaseInstance
 import com.example.murmurbox.entity.SelectedEmotionData
@@ -30,12 +32,11 @@ import java.util.Locale
 class EmotionSelectionFragment : Fragment() {
     private lateinit var emotionSelectionView: View
     private lateinit var rvEmotions: RecyclerView
-    private lateinit var imgEmotionStatus: ImageView
-    private lateinit var tvSelectedEmotion: TextView
-    private lateinit var tvBack: TextView
-    private lateinit var lnSelectedEmotion: LinearLayout
+    private lateinit var lnBack: LinearLayout
+    private lateinit var lnNext: LinearLayout
     private lateinit var crdContinue: CardView
     private lateinit var emotionAdapter: EmotionAdapter
+    private lateinit var frContainer: FrameLayout
     private val emotionList = ArrayList<EmotionData>()
     private val selectedEmotion = SelectedEmotionData()
 
@@ -59,16 +60,15 @@ class EmotionSelectionFragment : Fragment() {
 
         emotionSelectionView.apply {
             rvEmotions = findViewById(R.id.rvEmotions)
-            imgEmotionStatus = findViewById(R.id.imgEmotionStatus)
-            tvSelectedEmotion = findViewById(R.id.tvSelectedEmotion)
-            lnSelectedEmotion = findViewById(R.id.lnSelectedEmotion)
-            tvBack = findViewById(R.id.tvBack)
+            lnBack = findViewById(R.id.lnBack)
+            lnNext = findViewById(R.id.lnNext)
             crdContinue = findViewById(R.id.crdContinue)
+            frContainer = findViewById(R.id.frContainer)
         }
 
         loadAllEmotions()
 
-        tvBack.setSafeClickListener {
+        lnBack.setSafeClickListener {
             FragmentNavigation.goBack(requireActivity() as AppCompatActivity)
         }
 
@@ -77,6 +77,14 @@ class EmotionSelectionFragment : Fragment() {
                 gotoRecording()
             }
         }
+
+        lnNext.setSafeClickListener {
+            if (selectedEmotion.id != 0) {
+                gotoRecording()
+            }
+        }
+
+        (activity as MainActivity).changeTopAndBottomColor(R.color.light_blue,true)
 
         return emotionSelectionView
     }
@@ -103,24 +111,28 @@ class EmotionSelectionFragment : Fragment() {
                     backgroundColor = item.backgroundColor,
                     iconName = item.iconName,
                     titleColor = item.titleColor,
-                    descriptionColor = item.descriptionColor
+                    descriptionColor = item.descriptionColor,
+                    borderColor = item.borderColor
                 )
             })
 
-            rvEmotions.layoutManager = GridLayoutManager(requireContext(),2)
+            rvEmotions.layoutManager = GridLayoutManager(requireContext(),3)
             emotionAdapter = EmotionAdapter(emotionList, onItemClick = { item ->
                 selectedEmotion.apply {
                     id = item.id
                     emotion = item.emotion
-                    emotionColor = item.titleColor
+                    emotionColor = item.emotionColor
+                    backgroundColor = item.backgroundColor
                 }
 
-                tvSelectedEmotion.text = "feeling: ${selectedEmotion.emotion.lowercase()}"
-                imgEmotionStatus.setColorFilter(selectedEmotion.emotionColor.toColorInt())
-                lnSelectedEmotion.visibility = View.VISIBLE
+                (activity as MainActivity).changeTopAndBottomColor(selectedEmotion.backgroundColor.toColorInt(),true)
+                frContainer.setBackgroundColor(selectedEmotion.backgroundColor.toColorInt())
+                crdContinue.visibility = View.VISIBLE
+                lnNext.visibility = View.VISIBLE
             })
             rvEmotions.adapter = emotionAdapter
-            lnSelectedEmotion.visibility = View.GONE
+            crdContinue.visibility = View.GONE
+            lnNext.visibility = View.GONE
         }
     }
 }

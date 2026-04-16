@@ -54,14 +54,17 @@ class MainActivity : AppCompatActivity() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
     }
 
-    fun changeTopAndBottomColor(colorRes: Int, isLightColor: Boolean) {
-        val resolvedColor = ContextCompat.getColor(this, colorRes)
+    fun changeTopAndBottomColor(colorInput: Int, isLightColor: Boolean) {
+        val resolvedColor = try {
+            ContextCompat.getColor(this, colorInput)
+        } catch (e: Exception) {
+            colorInput
+        }
 
         window.statusBarColor = resolvedColor
         window.navigationBarColor = resolvedColor
 
         val controller = WindowInsetsControllerCompat(window, window.decorView)
-
         controller.isAppearanceLightStatusBars = isLightColor
         controller.isAppearanceLightNavigationBars = isLightColor
     }
@@ -73,16 +76,18 @@ class MainActivity : AppCompatActivity() {
                     id = 1,
                     emotion = "Happy",
                     description = "Joyful, grateful",
-                    backgroundColor = "#f2f7ea",
+                    borderColor = "#faa261",
+                    backgroundColor = "#ffe3c6",
                     iconName = "ic_happy",
-                    titleColor = "#27500A",
-                    descriptionColor = "#3B6D11"
+                    titleColor = "#faa261",
+                    descriptionColor = "#ffe3c6"
                 ),
                 Emotion(
                     id = 2,
                     emotion = "Sad",
                     description = "Heavy, tearful",
-                    backgroundColor = "#eaf2fb",
+                    borderColor = "#5090f6",
+                    backgroundColor = "#cfe2fd",
                     iconName = "ic_sad",
                     titleColor = "#0C447C",
                     descriptionColor = "#185FA5"
@@ -91,7 +96,8 @@ class MainActivity : AppCompatActivity() {
                     id = 3,
                     emotion = "Anxious",
                     description = "Restless, tense",
-                    backgroundColor = "#fdf4e7",
+                    borderColor = "#f7be53",
+                    backgroundColor = "#fdecb8",
                     iconName = "ic_anxious",
                     titleColor = "#633806",
                     descriptionColor = "#854F0B"
@@ -100,7 +106,8 @@ class MainActivity : AppCompatActivity() {
                     id = 4,
                     emotion = "Angry",
                     description = "Frustrated, mad",
-                    backgroundColor = "#fdf0eb",
+                    borderColor = "#f48282",
+                    backgroundColor = "#fdd5d5",
                     iconName = "ic_angry",
                     titleColor = "#712B13",
                     descriptionColor = "#993C1D"
@@ -109,7 +116,8 @@ class MainActivity : AppCompatActivity() {
                     id = 5,
                     emotion = "Lonely",
                     description = "Isolated, unseen",
-                    backgroundColor = "#f0effe",
+                    borderColor = "#9e79f7",
+                    backgroundColor = "#e5defd",
                     iconName = "ic_lonely",
                     titleColor = "#26215C",
                     descriptionColor = "#534AB7"
@@ -118,7 +126,8 @@ class MainActivity : AppCompatActivity() {
                     id = 6,
                     emotion = "Calm",
                     description = "Peaceful, still",
-                    backgroundColor = "#e8f8f3",
+                    borderColor = "#69d6af",
+                    backgroundColor = "#c2f5dd",
                     iconName = "ic_calm",
                     titleColor = "#085041",
                     descriptionColor = "#0F6E56"

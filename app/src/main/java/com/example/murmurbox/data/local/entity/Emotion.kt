@@ -13,5 +13,6 @@ data class Emotion(
     val backgroundColor: String,
     val iconName: String,
     val titleColor: String,
-    val descriptionColor: String
+    val descriptionColor: String,
+    val borderColor: String
 )

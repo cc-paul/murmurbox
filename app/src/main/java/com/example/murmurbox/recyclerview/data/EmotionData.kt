@@ -9,6 +9,7 @@ data class EmotionData(
     val emotion: String,
     val description: String,
     val backgroundColor: String,
+    val borderColor: String,
     val iconName: String,
     val titleColor: String,
     val descriptionColor: String

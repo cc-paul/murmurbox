@@ -2,20 +2,22 @@ package com.example.murmurbox.recyclerview.adapter
 
 import android.annotation.SuppressLint
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
-import androidx.recyclerview.widget.RecyclerView
 import androidx.core.graphics.toColorInt
+import androidx.recyclerview.widget.RecyclerView
 import com.example.murmurbox.R
+import com.example.murmurbox.entity.SelectedEmotionData
 import com.example.murmurbox.recyclerview.data.EmotionData
 
 class EmotionAdapter(
     private var items: ArrayList<EmotionData>,
-    private val onItemClick: (EmotionData) -> Unit
+    private val onItemClick: (SelectedEmotionData) -> Unit
 ) : RecyclerView.Adapter<EmotionAdapter.ViewHolder>() {
 
     private var selectedPosition = -1
@@ -34,21 +36,20 @@ class EmotionAdapter(
         holder.tvTitle.text = item.emotion
         holder.tvDescription.text = item.description
         holder.imgEmotion.setImageResource(getEmotionIcon(item.iconName))
-        holder.tvTitle.setTextColor(item.titleColor.toColorInt())
-        holder.tvDescription.setTextColor(item.descriptionColor.toColorInt())
-
-        holder.crdEmotionBackground.setCardBackgroundColor(
-            item.backgroundColor.toColorInt()
-        )
-
-        holder.crdEmotion.setCardBackgroundColor(
-            if (isSelected) R.color.light_black else Color.WHITE
-        )
+        holder.crdEmotion.setCardBackgroundColor(if (isSelected) item.borderColor.toColorInt() else Color.WHITE)
+        holder.crdEmotionBackground.setCardBackgroundColor(if (isSelected) item.backgroundColor.toColorInt() else Color.WHITE)
+        holder.tvTitle.setTextColor(if (isSelected) item.borderColor.toColorInt() else R.color.text_gray_2)
 
         holder.crdEmotion.setOnClickListener {
             val previousPosition = selectedPosition
+            val selectedEmotionData = SelectedEmotionData(
+                id = item.id,
+                emotion = item.emotion,
+                emotionColor = item.borderColor,
+                backgroundColor = item.backgroundColor
+            )
             selectedPosition = holder.bindingAdapterPosition
-            onItemClick(item)
+            onItemClick(selectedEmotionData)
 
             if (previousPosition != -1) notifyItemChanged(previousPosition)
             notifyItemChanged(selectedPosition)

@@ -12,7 +12,7 @@ import com.example.murmurbox.data.local.entity.User
         User::class,
         Emotion::class
     ],
-    version = 5
+    version = 7
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
