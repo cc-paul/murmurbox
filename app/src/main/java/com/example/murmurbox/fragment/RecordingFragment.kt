@@ -1,63 +1,71 @@
 package com.example.murmurbox.fragment
 
 import android.annotation.SuppressLint
-import android.media.Image
+import android.content.res.ColorStateList
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.murmurbox.MainActivity
 import com.example.murmurbox.R
+import com.example.murmurbox.recyclerview.adapter.WaveAdapter
+import com.example.murmurbox.recyclerview.data.WaveData
 import com.example.murmurbox.utils.FragmentNavigation
 import com.example.murmurbox.utils.setSafeClickListener
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.w3c.dom.Text
 
 class RecordingFragment : Fragment() {
-
     private lateinit var recordingView: View
-
-    private lateinit var tvBack: TextView
-    private lateinit var imgEmotionStatus: ImageView
-    private lateinit var tvSelectedEmotion: TextView
-    private lateinit var tvRecordDuration: TextView
-    private lateinit var lnPlayPause: LinearLayout
-    private lateinit var imgPlayPause: ImageView
-    private lateinit var lnStartStopSaveRecord: LinearLayout
-    private lateinit var lnDelete: LinearLayout
-    private lateinit var tvRecordReminder: TextView
+    private lateinit var frRecodingView: View
+    private lateinit var lnBack: LinearLayout
+    private lateinit var tvEmotionName: TextView
+    private lateinit var crdEmotionBorder: CardView
+    private lateinit var lnCircle: LinearLayout
+    private lateinit var crdEmotionBackground: CardView
+    private lateinit var rvWave: RecyclerView
+    private lateinit var tvTimer: TextView
     private lateinit var tvRecordStatus: TextView
-    private lateinit var waveContainer: LinearLayout
-    private lateinit var imgStartStopSaveRecord: ImageView
-    private lateinit var bars: List<View>
-
+    private lateinit var lnRecordPlayPause: LinearLayout
+    private lateinit var imgRecordPlayPause: ImageView
+    private lateinit var tvPressMic: TextView
+    private lateinit var lnOtherButtons: LinearLayout
+    private lateinit var crdRestart: CardView
+    private lateinit var crdDone: CardView
+    private lateinit var waveAdapter: WaveAdapter
+    private var id: Int = 0
+    private var backgroundColor: String = ""
+    private var borderColor: String = ""
+    private var name: String = ""
     private var waveJob: Job? = null
     private var timerJob: Job? = null
-    private var isTalking = false
-    private var isPlaying = false
-    private var hasRecord = false
-    private var seconds = 0
-    private var id: Int = 0
-    private var currentRecordStatus = START_RECORDING
-    private var emotionColor: String = ""
-    private var emotionName: String = ""
-
+    private var elapsedTime = 0L
+    private var isRunning = false
+    private var recordMode = RECORD_NOT_STARTED
+    private var defaultWaveColor = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         arguments?.let {
             id = it.getInt(KEY_ID)
-            emotionColor = it.getString(KEY_COLOR).toString()
-            emotionName = it.getString(KEY_NAME).toString()
+            backgroundColor = it.getString(KEY_BACKGROUND_COLOR).orEmpty()
+            borderColor = it.getString(KEY_BORDER_COLOR).orEmpty()
+            name = it.getString(KEY_NAME).orEmpty()
         }
     }
 
@@ -66,125 +74,181 @@ class RecordingFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         recordingView = inflater.inflate(R.layout.fragment_recording, container, false)
+        defaultWaveColor = ContextCompat.getColor(requireContext(), R.color.wave_gray)
 
         recordingView.apply {
-            tvBack = findViewById(R.id.tvBack)
-            imgEmotionStatus = findViewById(R.id.imgEmotionStatus)
-            tvSelectedEmotion = findViewById(R.id.tvSelectedEmotion)
-            tvRecordDuration = findViewById(R.id.tvRecordDuration)
-            lnPlayPause = findViewById(R.id.lnPlayPause)
-            imgPlayPause = findViewById(R.id.imgPlayPause)
-            lnStartStopSaveRecord = findViewById(R.id.lnStartStopSaveRecord)
-            imgStartStopSaveRecord = findViewById(R.id.imgStartStopSaveRecord)
-            lnDelete = findViewById(R.id.lnDelete)
-            tvRecordReminder = findViewById(R.id.tvRecordReminder)
+            frRecodingView = findViewById(R.id.frRecodingView)
+            lnBack = findViewById(R.id.lnBack)
+            tvEmotionName = findViewById(R.id.tvEmotionName)
+            lnCircle = findViewById(R.id.lnCircle)
+            crdEmotionBorder = findViewById(R.id.crdEmotionBorder)
+            crdEmotionBackground = findViewById(R.id.crdEmotionBackground)
+            rvWave = findViewById(R.id.rvWave)
+            tvTimer = findViewById(R.id.tvTimer)
             tvRecordStatus = findViewById(R.id.tvRecordStatus)
-            waveContainer = findViewById(R.id.waveContainer)
-            bars = listOf(
-                findViewById(R.id.bar1),
-                findViewById(R.id.bar2),
-                findViewById(R.id.bar3),
-                findViewById(R.id.bar4),
-                findViewById(R.id.bar5),
-                findViewById(R.id.bar6),
-                findViewById(R.id.bar7),
-                findViewById(R.id.bar8),
-                findViewById(R.id.bar9),
-                findViewById(R.id.bar10)
+            lnRecordPlayPause = findViewById(R.id.lnRecordPlayPause)
+            imgRecordPlayPause = findViewById(R.id.imgRecordPlayPause)
+            tvPressMic = findViewById(R.id.tvPressMic)
+            lnOtherButtons = findViewById(R.id.lnOtherButtons)
+            crdRestart = findViewById(R.id.crdRestart)
+            crdDone = findViewById(R.id.crdDone)
+        }
+
+        lnBack.setSafeClickListener {
+            FragmentNavigation.goBack(requireActivity() as AppCompatActivity)
+        }
+
+        setupWave()
+        changeEmotionLabel()
+        changeRecordStatusLabel()
+        changeRecordButtonUI()
+        changeOtherRecordButtonVisibility()
+
+        lnRecordPlayPause.setSafeClickListener {
+            when(recordMode) {
+                RECORD_NOT_STARTED -> {
+                    recordMode = RECORD_STARTED
+
+                    startWaveAnimation()
+                    startTimer()
+                }
+                RECORD_STARTED -> {
+                    if (isRunning) {
+                        pauseTimer()
+                        stopWaveAnimation()
+                    } else{
+                        startTimer()
+                        startWaveAnimation()
+                    }
+                }
+            }
+
+            changeOtherRecordButtonVisibility()
+            changeRecordStatusLabel()
+            changeRecordButtonUI()
+        }
+
+        crdRestart.setSafeClickListener {
+            recordMode = RECORD_NOT_STARTED
+
+
+            changeEmotionLabel()
+            changeRecordStatusLabel()
+            changeRecordButtonUI()
+            changeOtherRecordButtonVisibility()
+            stopWaveAnimation()
+            resetWave()
+            resetTimer()
+        }
+
+        crdDone.setSafeClickListener {
+            Toast.makeText(requireContext(),"Record has been saved successfully", Toast.LENGTH_LONG).show()
+
+            FragmentNavigation.openRootFragment(
+                requireActivity() as AppCompatActivity,
+                DashboardFragment(),
+                R.id.fragment_container
             )
-        }
-
-        tvBack.setSafeClickListener {
-            FragmentNavigation.goBack(requireActivity() as AppCompatActivity)
-        }
-
-        getSelectedEmotion()
-        stopTimer()
-        stopWaveAnimation()
-        setTalking(isTalking)
-        changeRecordStatusTitle()
-        changeRecordReminder(currentRecordStatus)
-        changeSubButtonAlpha()
-
-        lnStartStopSaveRecord.setSafeClickListener {
-            when (currentRecordStatus) {
-                START_RECORDING -> {
-                    isTalking = true
-                    currentRecordStatus = DURING_RECORDING
-                }
-                DURING_RECORDING -> {
-                    isTalking = false
-                    hasRecord = true
-                    currentRecordStatus = SAVE_RECORDING
-                }
-            }
-
-            if (isTalking) {
-                startTimer()
-                startWaveAnimation()
-            } else {
-                stopTimer()
-                stopWaveAnimation()
-            }
-
-            setTalking(isTalking)
-            changeRecordStatusTitle()
-            changeRecordReminder(currentRecordStatus)
-            changeSubButtonAlpha()
-        }
-
-        lnPlayPause.setOnClickListener {
-            if (hasRecord) {
-                isPlaying = !isPlaying
-                changePlayPauseButtonIcon()
-            }
-        }
-
-        lnDelete.setOnClickListener {
-            if (hasRecord) {
-
-            }
-        }
-
-        tvBack.setSafeClickListener {
-            //Need to check 1st if currently recording then ask question if want to stop
-            FragmentNavigation.goBack(requireActivity() as AppCompatActivity)
         }
 
         return recordingView
     }
 
-    private fun getSelectedEmotion() {
-        tvSelectedEmotion.text = emotionName
-        imgEmotionStatus.setColorFilter(emotionColor.toColorInt())
+    override fun onResume() {
+        super.onResume()
+        changeModuleColor()
     }
 
-    fun setTalking(talking: Boolean) {
-        isTalking = talking
+    override fun onDestroyView() {
+        super.onDestroyView()
 
-        if (talking) {
-            waveContainer.visibility = View.VISIBLE
-            startWaveAnimation()
-        } else {
-            waveContainer.visibility = View.GONE
-            stopWaveAnimation()
+        stopWaveAnimation()
+        resetWave()
+        pauseTimer()
+
+        rvWave.adapter = null
+    }
+
+    private fun changeRecordStatusLabel() {
+        when (recordMode) {
+            RECORD_NOT_STARTED -> {
+                tvRecordStatus.text = "Tap to start"
+            }
+            RECORD_STARTED -> {
+                tvRecordStatus.text = "Recording..."
+            }
         }
+    }
+
+    private fun changeOtherRecordButtonVisibility() {
+        when (recordMode) {
+            RECORD_NOT_STARTED -> {
+                tvPressMic.visibility = View.VISIBLE
+                lnOtherButtons.visibility = View.GONE
+            }
+            RECORD_STARTED -> {
+                tvPressMic.visibility = View.GONE
+                lnOtherButtons.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    @SuppressLint("ResourceAsColor")
+    private fun changeRecordButtonUI() {
+        var recordButtonColor: Int = R.color.dark_blue
+        var recordButtonImage: Int = R.drawable.ic_mic_white
+
+        when (recordMode) {
+            RECORD_NOT_STARTED -> {
+                recordButtonColor = ContextCompat.getColor(requireContext(), R.color.dark_blue)
+                recordButtonImage = R.drawable.ic_mic_white
+            }
+            RECORD_STARTED -> {
+                recordButtonColor = borderColor.toColorInt()
+
+                recordButtonImage = if (isRunning) {
+                    R.drawable.ic_pause_white
+                } else {
+                    R.drawable.ic_play_white
+                }
+            }
+        }
+
+        val drawable = lnRecordPlayPause.background.mutate()
+        drawable.setTint(recordButtonColor)
+        lnRecordPlayPause.background = drawable
+        imgRecordPlayPause.setImageResource(recordButtonImage)
+    }
+
+    private fun changeEmotionLabel() {
+        tvEmotionName.text = name
+        lnCircle.backgroundTintList = ColorStateList.valueOf(borderColor.toColorInt())
+        crdEmotionBorder.backgroundTintList = ColorStateList.valueOf(borderColor.toColorInt())
+        crdEmotionBackground.backgroundTintList = ColorStateList.valueOf(backgroundColor.toColorInt())
+    }
+
+    private fun setupWave() {
+        val waveList = ArrayList<WaveData>()
+
+        repeat(30) {
+            waveList.add(WaveData(height = 40,defaultWaveColor))
+        }
+
+        rvWave.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+
+        waveAdapter = WaveAdapter(waveList,defaultWaveColor)
+        rvWave.adapter = waveAdapter
     }
 
     private fun startWaveAnimation() {
         waveJob?.cancel()
 
         waveJob = viewLifecycleOwner.lifecycleScope.launch {
-            while (isTalking) {
-                bars.forEach { bar ->
-                    val height = (30..50).random()
-                    val params = bar.layoutParams
-                    params.height = height
-                    bar.layoutParams = params
-                }
-                delay(60)
+            while (true) {
+                waveAdapter.animateWave(borderColor.toColorInt())
+                delay(100)
             }
         }
     }
@@ -194,107 +258,78 @@ class RecordingFragment : Fragment() {
         waveJob = null
     }
 
-    @SuppressLint("SetTextI18n")
+    private fun resetWave() {
+        waveAdapter.reset(defaultWaveColor)
+    }
+
     private fun startTimer() {
-        timerJob?.cancel()
-        seconds = 0
+        if (isRunning) return
+
+        isRunning = true
+        waveAdapter.setPaused(false)
 
         timerJob = viewLifecycleOwner.lifecycleScope.launch {
-            while (true) {
-                val minutes = seconds / 60
-                val secs = seconds % 60
-
-                tvRecordDuration.text = "${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}"
-
-                seconds++
+            while (isRunning) {
+                updateTimerUI()
                 delay(1000)
+                elapsedTime += 1000
             }
         }
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun stopTimer() {
+    private fun pauseTimer() {
+        isRunning = false
         timerJob?.cancel()
-        timerJob = null
-        seconds = 0
-        tvRecordDuration.text = "00:00"
+
+        waveAdapter.setPaused(true)
     }
 
-    private fun changeRecordStatusTitle() {
-        if (isTalking) {
-            tvRecordStatus.text = "recording"
-        } else {
-            tvRecordStatus.text = "record not started"
-        }
+    private fun resetTimer() {
+        pauseTimer()
+        elapsedTime = 0
+        updateTimerUI()
     }
 
-    private fun changeRecordReminder(mode: Int) {
-        when (mode) {
+    @SuppressLint("DefaultLocale")
+    private fun updateTimerUI() {
+        val seconds = (elapsedTime / 1000) % 60
+        val minutes = (elapsedTime / (1000 * 60)) % 60
 
-            START_RECORDING -> {
-                tvRecordReminder.text = "tap circle to start recording"
-
-                imgStartStopSaveRecord.setImageDrawable(null)
-                imgStartStopSaveRecord.setImageResource(R.drawable.circle_white_bg)
-            }
-
-            DURING_RECORDING -> {
-                tvRecordReminder.text = "tap square to finish"
-
-                imgStartStopSaveRecord.setImageDrawable(null)
-                imgStartStopSaveRecord.setImageResource(R.drawable.ic_rounded_square)
-            }
-
-            SAVE_RECORDING -> {
-                tvRecordReminder.text =
-                    "tap to save your recording or go back here again to start a new one"
-
-                imgStartStopSaveRecord.setImageDrawable(null)
-                imgStartStopSaveRecord.setImageResource(R.drawable.ic_save)
-            }
-        }
-
-        imgStartStopSaveRecord.invalidate()
+        tvTimer.text = String.format("%02d : %02d", minutes, seconds)
     }
 
-    private fun changeSubButtonAlpha() {
-        if (hasRecord) {
-            lnPlayPause.alpha = 1f
-            lnDelete.alpha = 1f
-        } else {
-            lnPlayPause.alpha = 0.5f
-            lnDelete.alpha = 0.5f
-        }
+    private fun changeModuleColor() {
+        frRecodingView.setBackgroundColor(backgroundColor.toColorInt())
+        changeTopAndBottomColor(backgroundColor,true)
     }
 
-    private fun changePlayPauseButtonIcon() {
-        imgPlayPause.setImageResource(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play)
-    }
+    private fun changeTopAndBottomColor(color: String,isLightColor: Boolean = false) {
+        if (color == "") return
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        stopWaveAnimation()
-        stopTimer()
+        val resColor = color.toColorInt()
+        (activity as MainActivity).changeTopAndBottomColor(resColor,isLightColor)
     }
 
     companion object {
         private const val KEY_ID = "id"
-        private const val KEY_COLOR = "color"
+        private const val KEY_BACKGROUND_COLOR = "backgroundColor"
+        private const val KEY_BORDER_COLOR = "borderColor"
         private const val KEY_NAME = "name"
-        private const val START_RECORDING = 1
-        private const val DURING_RECORDING = 2
-        private const val SAVE_RECORDING = 3
+        private const val RECORD_NOT_STARTED = 1
+        private const val RECORD_STARTED = 2
 
         fun newInstance(
             id: Int,
-            emotionColor: String,
-            emotionName: String
+            backgroundColor: String,
+            borderColor: String,
+            name: String
         ): RecordingFragment {
             return RecordingFragment().apply {
                 arguments = Bundle().apply {
                     putInt(KEY_ID, id)
-                    putString(KEY_COLOR, emotionColor)
-                    putString(KEY_NAME, emotionName)
+                    putString(KEY_BACKGROUND_COLOR, backgroundColor)
+                    putString(KEY_BORDER_COLOR, borderColor)
+                    putString(KEY_NAME, name)
                 }
             }
         }

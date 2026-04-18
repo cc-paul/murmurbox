@@ -48,4 +48,24 @@ object FragmentNavigation {
             false
         }
     }
+
+    fun openRootFragment(
+        activity: AppCompatActivity,
+        fragment: Fragment,
+        containerId: Int
+    ) {
+        val fm = activity.supportFragmentManager
+
+        fm.popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE)
+
+        fm.fragments.forEach {
+            if (it != null) {
+                fm.beginTransaction().remove(it).commitNowAllowingStateLoss()
+            }
+        }
+
+        fm.beginTransaction()
+            .replace(containerId, fragment)
+            .commit()
+    }
 }

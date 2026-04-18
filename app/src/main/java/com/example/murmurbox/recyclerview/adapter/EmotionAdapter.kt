@@ -2,13 +2,13 @@ package com.example.murmurbox.recyclerview.adapter
 
 import android.annotation.SuppressLint
 import android.graphics.Color
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.example.murmurbox.R
@@ -38,15 +38,21 @@ class EmotionAdapter(
         holder.imgEmotion.setImageResource(getEmotionIcon(item.iconName))
         holder.crdEmotion.setCardBackgroundColor(if (isSelected) item.borderColor.toColorInt() else Color.WHITE)
         holder.crdEmotionBackground.setCardBackgroundColor(if (isSelected) item.backgroundColor.toColorInt() else Color.WHITE)
-        holder.tvTitle.setTextColor(if (isSelected) item.borderColor.toColorInt() else R.color.text_gray_2)
+        val color = if (isSelected) {
+            item.borderColor.toColorInt()
+        } else {
+            ContextCompat.getColor(holder.itemView.context, R.color.text_color_gray)
+        }
+        holder.tvTitle.setTextColor(color)
+
 
         holder.crdEmotion.setOnClickListener {
             val previousPosition = selectedPosition
             val selectedEmotionData = SelectedEmotionData(
                 id = item.id,
                 emotion = item.emotion,
-                emotionColor = item.borderColor,
-                backgroundColor = item.backgroundColor
+                backgroundColor = item.backgroundColor,
+                borderColor = item.borderColor
             )
             selectedPosition = holder.bindingAdapterPosition
             onItemClick(selectedEmotionData)

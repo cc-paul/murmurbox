@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.window.SplashScreenView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.murmurbox.MainActivity
 import com.example.murmurbox.R
 import com.example.murmurbox.data.local.database.AppDatabaseInstance
 import com.example.murmurbox.utils.FragmentNavigation
@@ -16,13 +17,6 @@ import kotlinx.coroutines.launch
 
 class SplashFragment : Fragment() {
     private lateinit var splashScreeView: View
-    private val db by lazy {
-        AppDatabaseInstance.getDatabase(requireContext())
-    }
-
-    private val userDao by lazy {
-        db.userDao()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,32 +29,16 @@ class SplashFragment : Fragment() {
         splashScreeView = inflater.inflate(R.layout.fragment_splash, container, false)
 
         lifecycleScope.launch {
-            delay(2000)
-            checkExistingAccount()
+            delay(4000)
+            showDashboardScreen()
         }
 
         return splashScreeView
     }
 
-    private fun checkExistingAccount() {
-        lifecycleScope.launch {
-            val isAccountExist = userDao.getUser() == 1
-
-            if (!isAccountExist) {
-                showNameScreen()
-            } else {
-                showDashboardScreen()
-            }
-        }
-    }
-
-    private fun showNameScreen() {
-        FragmentNavigation.navigate(
-            requireActivity() as AppCompatActivity,
-            NameFragment(),
-            R.id.fragment_container,
-            isRoot = true
-        )
+    override fun onResume() {
+        super.onResume()
+        (activity as MainActivity).changeTopAndBottomColor(R.color.light_blue,true)
     }
 
     private fun showDashboardScreen() {

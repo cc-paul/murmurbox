@@ -45,11 +45,17 @@ class DashboardFragment : Fragment() {
             showEmotionSelection()
         }
 
+
+        setDefaultColor()
         return dashboardView
     }
 
     override fun onResume() {
         super.onResume()
+        setDefaultColor()
+    }
+
+    private fun setDefaultColor() {
         (activity as MainActivity).changeTopAndBottomColor(R.color.light_blue,true)
     }
 

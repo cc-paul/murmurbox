@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primary"
+    android:background="@color/light_blue"
     android:gravity="center"
     tools:context=".fragment.SplashFragment">
 
@@ -20,8 +20,8 @@
 
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:src="@drawable/murmur_icon" />
+            android:layout_height="100dp"
+            android:src="@drawable/app_icon_v2" />
 
         <TextView
             android:layout_width="match_parent"
@@ -29,7 +29,7 @@
             android:layout_marginTop="20dp"
             android:fontFamily="@font/man_bold"
             android:gravity="center"
-            android:text="murmurbox"
+            android:text="MurmurBox"
             android:textSize="30sp"
             android:textStyle="bold" />
 
@@ -43,28 +43,8 @@
             android:textColor="@color/text_color_gray"
             android:textStyle="bold" />
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:src="@drawable/murmur_icon2" />
-
 
     </LinearLayout>
 
-    <TextView
-        android:letterSpacing="0.2"
-        android:textSize="12dp"
-        android:fontFamily="@font/man_semi"
-        android:textColor="@color/text_color_gray"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="YOUR VOICE STAYS PRIVATE"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-        app:layout_constraintVertical_bias="0.828" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,10 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.graphics.toColorInt
@@ -26,7 +23,6 @@ import com.example.murmurbox.recyclerview.data.EmotionData
 import com.example.murmurbox.utils.FragmentNavigation
 import com.example.murmurbox.utils.setSafeClickListener
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 
 class EmotionSelectionFragment : Fragment() {
@@ -89,10 +85,21 @@ class EmotionSelectionFragment : Fragment() {
         return emotionSelectionView
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        changeTopAndBottomColor(selectedEmotion.borderColor)
+    }
+
     private fun gotoRecording() {
         FragmentNavigation.navigate(
             requireActivity() as AppCompatActivity,
-            RecordingFragment.newInstance(selectedEmotion.id,selectedEmotion.emotionColor,selectedEmotion.emotion),
+            RecordingFragment.newInstance(
+                selectedEmotion.id,
+                selectedEmotion.backgroundColor,
+                selectedEmotion.borderColor,
+                selectedEmotion.emotion
+            ),
             R.id.fragment_container
         )
     }
@@ -121,18 +128,25 @@ class EmotionSelectionFragment : Fragment() {
                 selectedEmotion.apply {
                     id = item.id
                     emotion = item.emotion
-                    emotionColor = item.emotionColor
                     backgroundColor = item.backgroundColor
+                    borderColor = item.borderColor
                 }
 
-                (activity as MainActivity).changeTopAndBottomColor(selectedEmotion.backgroundColor.toColorInt(),true)
+                changeTopAndBottomColor(selectedEmotion.backgroundColor)
                 frContainer.setBackgroundColor(selectedEmotion.backgroundColor.toColorInt())
                 crdContinue.visibility = View.VISIBLE
                 lnNext.visibility = View.VISIBLE
             })
             rvEmotions.adapter = emotionAdapter
-            crdContinue.visibility = View.GONE
-            lnNext.visibility = View.GONE
+            crdContinue.visibility = View.INVISIBLE
+            lnNext.visibility = View.INVISIBLE
         }
+    }
+
+    private fun changeTopAndBottomColor(color: String,isLightColor: Boolean = false) {
+        if (color == "") return
+
+        val resColor = color.toColorInt()
+        (activity as MainActivity).changeTopAndBottomColor(resColor,isLightColor)
     }
 }
