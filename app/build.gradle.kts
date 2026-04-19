@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.murmurbox"
+    namespace = "com.pagshq.murmurbox"
     compileSdk = 36
 
     flavorDimensions.add("env")
@@ -16,7 +16,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.murmurbox"
+        applicationId = "com.pagshq.murmurbox"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -51,7 +51,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -64,4 +63,5 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     kapt(libs.androidx.room.compiler)
+    implementation(libs.permissionx)
 }
